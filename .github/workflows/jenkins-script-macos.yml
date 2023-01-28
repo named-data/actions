@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      submodules:
+        description: 'Whether to checkout submodules'
+        default: false
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Xcode ${{ matrix.xcode }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: macos-11, xcode: '12.4'}
+          - {os: macos-11, xcode: '12.5'}
+          - {os: macos-11, xcode: '13.2'}
+          - {os: macos-12, xcode: '13.4'}
+          - {os: macos-12, xcode: '14.2'}
+    steps:
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: ${{ inputs.submodules }}
+      - name: Build and test
+        run: ./.jenkins
+        env:
+          CACHE_DIR: ${{ runner.temp }}
