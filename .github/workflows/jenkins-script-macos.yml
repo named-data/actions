@@ -1,3 +1,4 @@
+name: Run .jenkins script (macOS)
 on:
   workflow_call:
     inputs:
