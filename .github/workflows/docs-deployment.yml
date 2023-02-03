@@ -1,0 +1,66 @@
+name: Deploy documentation
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: 'Project name'
+        required: false
+        type: string
+      version:
+        description: 'Project version'
+        required: false
+        type: string
+      artifact-name:
+        description: 'Name of the artifact containing the files to be deployed'
+        default: docs
+        required: false
+        type: string
+
+permissions: {}
+
+jobs:
+  deploy:
+    if: vars.DOCS_DEPLOYMENT_HOST != ''
+    runs-on: ubuntu-latest
+    concurrency: docs
+    environment:
+      name: docs
+      url: https://${{ vars.DOCS_DEPLOYMENT_HOST }}/${{ steps.metadata.outputs.slug }}/
+    steps:
+      - name: Determine project name and version
+        id: metadata
+        run: |
+          name="${{ inputs.project }}"
+          if [[ -z ${name} ]]; then
+            name=${GITHUB_REPOSITORY#*/}
+          fi
+          version="${{ inputs.version }}"
+          if [[ -z ${version} ]]; then
+            version=${GITHUB_REF_NAME#${name}-}
+          fi
+          tee -a ${GITHUB_OUTPUT} <<EOF
+          name=${name}
+          version=${version}
+          slug=${name}/${version}
+          EOF
+      - name: Download archive
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifact-name }}
+      - name: Extract archive
+        run: |
+          shopt -s nullglob
+          for f in *.tar.*; do
+            tar -xf "$f"
+            rm -f "$f"
+          done
+      - name: Deploy to ${{ vars.DOCS_DEPLOYMENT_HOST }}
+        uses: easingthemes/ssh-deploy@v4
+        with:
+          ARGS: -chirvEW --delay-updates --delete-delay
+          REMOTE_HOST: ${{ vars.DOCS_DEPLOYMENT_HOST }}
+          REMOTE_PORT: ${{ secrets.DOCS_DEPLOYMENT_PORT }}
+          REMOTE_USER: ${{ secrets.DOCS_DEPLOYMENT_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.DOCS_DEPLOYMENT_SSH_KEY }}
+          SOURCE: ./
+          TARGET: /srv/docs/${{ steps.metadata.outputs.slug }}/
