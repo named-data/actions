@@ -1,0 +1,65 @@
+name: Build HTML documentation
+on:
+  workflow_call:
+    inputs:
+      submodules:
+        description: 'Whether to checkout submodules'
+        default: false
+        required: false
+        type: boolean
+      deploy:
+        description: 'Whether to deploy the documentation'
+        default: false
+        required: false
+        type: boolean
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ inputs.deploy && !matrix.upload }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-12, ubuntu-22.04]
+        include:
+          - os: ubuntu-22.04
+            upload: ${{ inputs.deploy }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: ${{ inputs.submodules }}
+      - name: Install dependencies
+        run: |
+          find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +
+          ./.jenkins
+        env:
+          CACHE_DIR: ${{ runner.temp }}
+          JOB_NAME: Docs
+      - name: Prepare environment
+        run: echo "$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))')" >> $GITHUB_PATH
+      - name: Build HTML documentation
+        run: |
+          ./waf --color=yes configure
+          ./waf --color=yes build --targets=version.hpp || true
+          ./waf --color=yes docs
+      - name: Create archive
+        if: matrix.upload
+        run: |
+          rm -rf build/docs/{.buildinfo,.doctrees,doxygen.conf}
+          tar -caf docs.tar.zst -C build/docs .
+      - name: Upload archive
+        if: matrix.upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: docs.tar.zst
+          retention-days: 1
+
+  deploy:
+    if: inputs.deploy
+    needs: build
+    uses: ./.github/workflows/docs-deployment.yml
+    secrets: inherit

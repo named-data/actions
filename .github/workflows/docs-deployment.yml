@@ -29,19 +29,20 @@ jobs:
     steps:
       - name: Determine project name and version
         id: metadata
+        env:
+          PN: ${{ inputs.project }}
+          PV: ${{ inputs.version }}
         run: |
-          name="${{ inputs.project }}"
-          if [[ -z ${name} ]]; then
-            name=${GITHUB_REPOSITORY#*/}
+          if [[ -z ${PN} ]]; then
+            PN=${GITHUB_REPOSITORY#*/}
           fi
-          version="${{ inputs.version }}"
-          if [[ -z ${version} ]]; then
-            version=${GITHUB_REF_NAME#${name}-}
+          if [[ -z ${PV} ]]; then
+            PV=${GITHUB_REF_NAME#${PN}-}
           fi
           tee -a ${GITHUB_OUTPUT} <<EOF
-          name=${name}
-          version=${version}
-          slug=${name}/${version}
+          name=${PN}
+          version=${PV}
+          slug=${PN}/${PV}
           EOF
       - name: Download archive
         uses: actions/download-artifact@v3
