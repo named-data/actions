@@ -32,6 +32,12 @@ jobs:
         with:
           fetch-depth: ${{ !matrix.upload && 1 || 0 }}
           submodules: ${{ inputs.submodules }}
+      - name: Fix tag
+        # Workaround actions/checkout bug
+        # https://github.com/actions/checkout/issues/290
+        # https://github.com/actions/checkout/issues/882
+        if: github.ref_type == 'tag'
+        run: git fetch -fv origin tag "${GITHUB_REF_NAME}"
       - name: Install dependencies
         run: |
           find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +
