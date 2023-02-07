@@ -30,6 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          fetch-depth: ${{ !matrix.upload && 1 || 0 }}
           submodules: ${{ inputs.submodules }}
       - name: Install dependencies
         run: |
