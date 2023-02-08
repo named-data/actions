@@ -3,15 +3,19 @@ on:
   workflow_call:
     inputs:
       project:
-        description: 'Project name'
+        description: >
+          Project name. By default, this is derived from $GITHUB_REPOSITORY.
         required: false
         type: string
       version:
-        description: 'Project version'
+        description: >
+          Project version. By default, this is derived from $GITHUB_REF_NAME.
         required: false
         type: string
       artifact-name:
-        description: 'Name of the artifact containing the files to be deployed'
+        description: >
+          Name of the artifact containing the files to be deployed. Any
+          top-level tarballs in the artifact are automatically extracted.
         default: docs
         required: false
         type: string
@@ -38,6 +42,7 @@ jobs:
           fi
           if [[ -z ${PV} ]]; then
             PV=${GITHUB_REF_NAME#${PN}-}
+            PV=${PV#v}
           fi
           tee -a ${GITHUB_OUTPUT} <<EOF
           name=${PN}

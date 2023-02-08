@@ -18,6 +18,7 @@ permissions: {}
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    # If deployments are enabled, ignore errors in jobs that are not required for deploying
     continue-on-error: ${{ inputs.deploy && !matrix.upload }}
     strategy:
       fail-fast: false
