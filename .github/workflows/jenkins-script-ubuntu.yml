@@ -14,6 +14,7 @@ jobs:
   build:
     name: ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -24,6 +25,7 @@ jobs:
           - {os: ubuntu-22.04, compiler: g++-10}
           - {os: ubuntu-22.04, compiler: g++-11}
           - {os: ubuntu-22.04, compiler: g++-12}
+          - {os: ubuntu-22.04, compiler: g++-latest, experimental: true}
           - {os: ubuntu-20.04, compiler: clang++-7}
           - {os: ubuntu-20.04, compiler: clang++-8}
           - {os: ubuntu-20.04, compiler: clang++-9}
@@ -37,8 +39,21 @@ jobs:
     steps:
       - name: Install C++ compiler
         run: |
-          sudo apt-get -qy install ${CXX/clang++/clang}
-          ${CXX} --version
+          case ${CXX} in
+            g++-latest)
+              curl -fLOSs 'https://kayari.org/gcc-latest/gcc-latest.deb'
+              sudo dpkg -i gcc-latest.deb
+              rm gcc-latest.deb
+              sudo ln -s g++ /opt/gcc-latest/bin/g++-latest
+              echo /opt/gcc-latest/bin >> $GITHUB_PATH
+              echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> $GITHUB_ENV
+              ;;
+            *)
+              sudo apt-get -qy install ${CXX/clang++/clang}
+              ;;
+          esac
+      - name: Print compiler version
+        run: ${CXX} --version
       - name: Checkout
         uses: actions/checkout@v3
         with:
