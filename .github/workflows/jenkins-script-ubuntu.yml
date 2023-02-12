@@ -14,7 +14,7 @@ jobs:
   build:
     name: ${{ matrix.compiler }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ !!matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -34,6 +34,9 @@ jobs:
           - {os: ubuntu-22.04, compiler: clang++-12}
           - {os: ubuntu-22.04, compiler: clang++-13}
           - {os: ubuntu-22.04, compiler: clang++-14}
+          - {os: ubuntu-22.04, compiler: clang++-15}
+          - {os: ubuntu-22.04, compiler: clang++-16}
+          - {os: ubuntu-22.04, compiler: clang++-17, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
@@ -48,6 +51,11 @@ jobs:
               echo /opt/gcc-latest/bin >> $GITHUB_PATH
               echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> $GITHUB_ENV
               ;;
+            clang++-1[567])
+              curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
+                | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
+              sudo apt-get -qq update
+              ;&
             *)
               sudo apt-get -qy install ${CXX/clang++/clang}
               ;;
