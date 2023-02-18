@@ -5,19 +5,16 @@ on:
       project:
         description: >
           Project name. By default, this is derived from $GITHUB_REPOSITORY.
-        required: false
         type: string
       version:
         description: >
           Project version. By default, this is derived from $GITHUB_REF_NAME.
-        required: false
         type: string
       artifact-name:
         description: >
           Name of the artifact containing the files to be deployed. Any
           top-level tarballs in the artifact are automatically extracted.
         default: docs
-        required: false
         type: string
 
 permissions: {}

@@ -5,20 +5,36 @@ on:
       submodules:
         description: 'Whether to checkout submodules'
         default: false
-        required: false
         type: boolean
+      upload:
+        description: 'Whether to upload an archive of the documentation'
+        default: false
+        type: boolean
+      artifact-name:
+        description: 'Artifact name to use for the uploaded documentation'
+        default: docs
+        type: string
+      artifact-retention-days:
+        description: 'Number of days after which the artifact will expire'
+        default: 1
+        type: number
       deploy:
         description: 'Whether to deploy the documentation'
         default: false
-        required: false
         type: boolean
+      project:
+        description: 'Project name for the deployment'
+        type: string
+      version:
+        description: 'Project version for the deployment'
+        type: string
 
 permissions: {}
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    # If deployments are enabled, ignore errors in jobs that are not required for deploying
+    # If deployment is enabled, ignore errors in jobs that are not required for deploying
     continue-on-error: ${{ inputs.deploy && !matrix.upload }}
     strategy:
       fail-fast: false
@@ -26,7 +42,7 @@ jobs:
         os: [macos-12, ubuntu-22.04]
         include:
           - os: ubuntu-22.04
-            upload: ${{ inputs.deploy }}
+            upload: ${{ inputs.upload || inputs.deploy }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -56,18 +72,22 @@ jobs:
       - name: Create archive
         if: matrix.upload
         run: |
-          rm -rf build/docs/{.buildinfo,.doctrees,doxygen.conf}
+          rm -rf build/docs/{.buildinfo,.doctrees,Doxyfile,doxygen.conf}
           tar -caf docs.tar.zst -C build/docs .
       - name: Upload archive
         if: matrix.upload
         uses: actions/upload-artifact@v3
         with:
-          name: docs
+          name: ${{ inputs.artifact-name }}
           path: docs.tar.zst
-          retention-days: 1
+          retention-days: ${{ inputs.artifact-retention-days }}
 
   deploy:
     if: inputs.deploy
     needs: build
     uses: ./.github/workflows/docs-deployment.yml
+    with:
+      project: ${{ inputs.project }}
+      version: ${{ inputs.version }}
+      artifact-name: ${{ inputs.artifact-name }}
     secrets: inherit
