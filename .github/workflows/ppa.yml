@@ -1,0 +1,49 @@
+name: Build against PPA packages
+on:
+  workflow_call:
+    inputs:
+      submodules:
+        description: 'Whether to checkout submodules'
+        default: false
+        type: boolean
+
+permissions: {}
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: ${{ inputs.submodules }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get -qy install software-properties-common
+          sudo add-apt-repository -uy ppa:named-data/ppa
+          sudo apt-get -qy install --no-install-recommends libndn-cxx-dev
+      - name: Release build
+        run: |
+          ARGS=()
+          if ./waf configure --help | grep -Fw -- --with-examples >/dev/null; then
+            ARGS+=(--with-examples)
+          fi
+          set -x
+          ./waf --color=yes distclean
+          ./waf --color=yes configure "${ARGS[@]}"
+          ./waf --color=yes build
+      - name: Debug build
+        run: |
+          ARGS=(--debug)
+          if ./waf configure --help | grep -Fw -- --with-tests >/dev/null; then
+            ARGS+=(--with-tests)
+          fi
+          set -x
+          ./waf --color=yes distclean
+          ./waf --color=yes configure "${ARGS[@]}"
+          ./waf --color=yes build
