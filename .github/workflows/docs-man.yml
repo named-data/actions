@@ -17,7 +17,7 @@ jobs:
       matrix:
         os: [macos-12, ubuntu-22.04]
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           submodules: ${{ inputs.submodules }}

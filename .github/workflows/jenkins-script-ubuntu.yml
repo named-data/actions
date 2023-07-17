@@ -1,9 +1,22 @@
 name: Run .jenkins script (Ubuntu)
+run-name: ${{ inputs.repository }}
+
 on:
   workflow_call:
     inputs:
       submodules:
         description: 'Whether to checkout submodules'
+        default: false
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: 'Full name of the repository on which to run the workflow'
+        default: named-data/
+        required: true
+        type: string
+      submodules:
+        description: 'Checkout submodules?'
         default: false
         type: boolean
 
@@ -65,9 +78,10 @@ jobs:
           esac
       - name: Print compiler version
         run: ${CXX} --version
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
+          repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
       - name: Build and test
         run: ./.jenkins
