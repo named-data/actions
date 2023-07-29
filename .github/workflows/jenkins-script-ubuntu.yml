@@ -49,7 +49,8 @@ jobs:
           - {os: ubuntu-22.04, compiler: clang++-14}
           - {os: ubuntu-22.04, compiler: clang++-15}
           - {os: ubuntu-22.04, compiler: clang++-16}
-          - {os: ubuntu-22.04, compiler: clang++-17, experimental: true}
+          - {os: ubuntu-22.04, compiler: clang++-17}
+          - {os: ubuntu-22.04, compiler: clang++-18, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
@@ -65,14 +66,14 @@ jobs:
               echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> $GITHUB_ENV
               ;;
             g++-13)
-              sudo add-apt-repository -y -P ubuntu-toolchain-r/test
+              sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
-            clang++-1[567])
+            clang++-1[678])
               curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
                 | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
-              sudo apt-get -qq update
               ;;&
             *)
+              sudo apt-get -qq update
               sudo apt-get -qy install ${CXX/clang++/clang}
               ;;
           esac

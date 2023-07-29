@@ -1,6 +1,6 @@
 Types: deb deb-src
 URIs: http://apt.llvm.org/jammy/
-Suites: llvm-toolchain-jammy llvm-toolchain-jammy-16 llvm-toolchain-jammy-15
+Suites: llvm-toolchain-jammy llvm-toolchain-jammy-17 llvm-toolchain-jammy-16
 Components: main
 Signed-By:
  -----BEGIN PGP PUBLIC KEY BLOCK-----
