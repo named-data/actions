@@ -45,7 +45,7 @@ jobs:
             upload: ${{ inputs.upload || inputs.deploy }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ !matrix.upload && 1 || 0 }}
           submodules: ${{ inputs.submodules }}

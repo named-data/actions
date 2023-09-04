@@ -42,7 +42,7 @@ jobs:
         with:
           xcode-version: ${{ matrix.xcode }}
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
