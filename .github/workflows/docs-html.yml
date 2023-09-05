@@ -49,6 +49,7 @@ jobs:
         with:
           fetch-depth: ${{ !matrix.upload && 1 || 0 }}
           submodules: ${{ inputs.submodules }}
+          show-progress: false
       - name: Fix tag
         # Workaround actions/checkout bug
         # https://github.com/actions/checkout/issues/290

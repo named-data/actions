@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: ${{ inputs.submodules }}
+          show-progress: false
       - name: Install dependencies
         run: |
           find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +

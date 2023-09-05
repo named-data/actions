@@ -46,6 +46,7 @@ jobs:
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
+          show-progress: false
       - name: Build and test
         run: ./.jenkins
         env:

@@ -36,6 +36,7 @@ jobs:
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
+          show-progress: false
       - name: Install dependencies
         run: |
           sudo apt-get -qy install software-properties-common
