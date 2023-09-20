@@ -36,6 +36,7 @@ jobs:
           - {os: macos-12, xcode: '13.4'}
           - {os: macos-12, xcode: '14.2'}
           - {os: macos-13, xcode: '14.3'}
+          - {os: macos-13, xcode: '15.0'}
     steps:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
