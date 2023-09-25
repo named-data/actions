@@ -58,7 +58,7 @@ jobs:
             rm -f "$f"
           done
       - name: Deploy to ${{ vars.DOCS_DEPLOYMENT_HOST }}
-        uses: easingthemes/ssh-deploy@3884c8554ff45c0fd37d3f12a76288d06ce7a2ff # v4.1.8
+        uses: easingthemes/ssh-deploy@29425230012617326eaf67330b3a2f058d2a2596 # v4.1.9
         with:
           ARGS: -chirvzEW --delay-updates --delete-delay
           REMOTE_HOST: ${{ vars.DOCS_DEPLOYMENT_HOST }}
