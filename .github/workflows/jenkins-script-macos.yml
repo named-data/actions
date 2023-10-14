@@ -1,5 +1,5 @@
 name: Run .jenkins script (macOS)
-run-name: ${{ inputs.repository }}
+run-name: Build ${{ inputs.repository }} on macOS
 
 on:
   workflow_call:

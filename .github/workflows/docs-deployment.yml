@@ -38,7 +38,7 @@ jobs:
             PN=${GITHUB_REPOSITORY#*/}
           fi
           if [[ -z ${PV} ]]; then
-            PV=${GITHUB_REF_NAME#${PN}-}
+            PV=${GITHUB_REF_NAME#"${PN}"-}
             PV=${PV#v}
           fi
           tee -a ${GITHUB_OUTPUT} <<EOF

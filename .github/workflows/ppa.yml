@@ -1,5 +1,5 @@
 name: Build against PPA packages
-run-name: ${{ inputs.repository }}
+run-name: Build ${{ inputs.repository }} against PPA
 
 on:
   workflow_call:
