@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -57,6 +57,7 @@ jobs:
           ARGS=(--debug)
           if ./waf configure --help | grep -Fw -- --with-tests >/dev/null; then
             ARGS+=(--with-tests)
+            sudo apt-get -qy install --no-install-recommends libboost-test-dev
           fi
           set -x
           ./waf --color=yes distclean
