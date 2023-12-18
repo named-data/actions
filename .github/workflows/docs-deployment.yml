@@ -47,7 +47,7 @@ jobs:
           slug=${PN}/${PV}
           EOF
       - name: Download archive
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
       - name: Extract archive
