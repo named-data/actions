@@ -16,7 +16,7 @@ on:
         type: string
       artifact-retention-days:
         description: 'Number of days after which the artifact will expire'
-        default: 1
+        default: 10
         type: number
       deploy:
         description: 'Whether to deploy the documentation'
@@ -77,10 +77,11 @@ jobs:
           tar -caf docs.tar.zst -C build/docs .
       - name: Upload archive
         if: matrix.upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
           path: docs.tar.zst
+          compression-level: 0
           retention-days: ${{ inputs.artifact-retention-days }}
 
   deploy:
