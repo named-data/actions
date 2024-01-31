@@ -32,9 +32,9 @@ jobs:
         include:
           - {os: macos-11, xcode: '12.4'} # Based on LLVM 10
           - {os: macos-11, xcode: '12.5'} # Based on LLVM 11
-          - {os: macos-11, xcode: '13.2'} # Based on LLVM 12
+          - {os: macos-12, xcode: '13.2'} # Based on LLVM 12
           - {os: macos-12, xcode: '13.4'} # Based on LLVM 13
-          - {os: macos-12, xcode: '14.2'} # Based on LLVM 14
+          - {os: macos-13, xcode: '14.2'} # Based on LLVM 14
           - {os: macos-13, xcode: '14.3'} # Based on LLVM 15
           - {os: macos-13, xcode: '15.2'} # Based on LLVM 16
           - {os: macos-14, xcode: '15.2'} # Based on LLVM 16
