@@ -1,0 +1,227 @@
+name: Publish container image
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: 'Last component of the image name'
+        required: true
+        type: string
+      dockerfile:
+        description: 'Path to the Dockerfile'
+        default: Dockerfile
+        type: string
+      target:
+        description: 'Target stage to build'
+        type: string
+      build-args:
+        description: 'List of build-time variables'
+        type: string
+      contexts:
+        description: 'List of additional build contexts'
+        type: string
+      sign:
+        description: 'Whether to sign the image'
+        default: true
+        type: boolean
+    outputs:
+      image:
+        value: ${{ jobs.finalize.outputs.image }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      image-name: ${{ steps.prepare.outputs.image-name }}
+      timestamp: ${{ steps.prepare.outputs.timestamp }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Prepare outputs
+        id: prepare
+        env:
+          SLUG: ${{ github.repository_owner }}/${{ inputs.name }}
+        run: |
+          tee -a "$GITHUB_OUTPUT" <<EOF
+          image-name=ghcr.io/${SLUG,,}
+          timestamp=$(git log -1 --format=%ct)
+          EOF
+
+  build:
+    runs-on: ubuntu-latest
+    needs: prepare
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
+    env:
+      SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.timestamp }}
+    steps:
+      - name: Set up QEMU
+        if: matrix.arch != 'amd64'
+        uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
+        with:
+          image: tonistiigi/binfmt:qemu-v8.1.5
+          platforms: ${{ matrix.arch }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@2b51285047da1547ffb1b2203d8be4c0af6b1f20 # v3.2.0
+
+      - name: Generate metadata for ${{ matrix.arch }} image
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
+        with:
+          tags: |
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.arch }} image
+        id: build
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5.3.0
+        with:
+          platforms: linux/${{ matrix.arch }}
+          file: ${{ inputs.dockerfile }}
+          target: ${{ inputs.target }}
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=1
+            ${{ inputs.build-args }}
+          build-contexts: ${{ inputs.contexts }}
+          pull: true
+          outputs: type=registry,name=${{ needs.prepare.outputs.image-name }},name-canonical=true,push-by-digest=true
+          provenance: mode=max
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+
+      - name: Export digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          touch "${{ runner.temp }}/digests/${DIGEST#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ inputs.name }}-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  finalize:
+    runs-on: ubuntu-latest
+    needs: [prepare, build]
+    permissions:
+      packages: write
+    outputs:
+      image: ${{ needs.prepare.outputs.image-name }}@${{ steps.inspect.outputs.digest }}
+    env:
+      SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.timestamp }}
+    steps:
+      - name: Download digests
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          pattern: digest-${{ inputs.name }}-*
+          path: ${{ runner.temp }}/digests
+          merge-multiple: true
+
+      - name: Delete temporary artifacts
+        continue-on-error: true
+        uses: geekyeggo/delete-artifact@24928e75e6e6590170563b8ddae9fac674508aa1 # v5.0.0
+        with:
+          name: digest-${{ inputs.name }}-*
+
+      - name: Generate metadata
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
+        with:
+          images: ${{ needs.prepare.outputs.image-name }}
+          tags: |
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-platform image index
+        working-directory: ${{ steps.download.outputs.download-path }}
+        env:
+          IMAGE_NAME: ${{ needs.prepare.outputs.image-name }}
+        run: |
+          readarray -t annotations < <(jq -r '.annotations[] | ("--annotation", .)' <<< "${DOCKER_METADATA_OUTPUT_JSON}")
+          readarray -t tags < <(jq -r '.tags[] | ("--tag", .)' <<< "${DOCKER_METADATA_OUTPUT_JSON}")
+          docker buildx imagetools create "${annotations[@]}" "${tags[@]}" $(find . -type f -printf "${IMAGE_NAME}@sha256:%f ")
+
+      - name: Inspect final image and prepare outputs
+        id: inspect
+        env:
+          SHORT_NAME: ${{ inputs.name }}
+          NAME_AND_TAG: "${{ needs.prepare.outputs.image-name }}:${{ steps.meta.outputs.version }}"
+        run: |
+          manifest=$(docker buildx imagetools inspect --format '{{json .Manifest}}' "${NAME_AND_TAG}")
+          digest=$(jq -j .digest <<< "${manifest}")
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          (
+            echo "## ${SHORT_NAME}"
+            echo
+            echo "- Image name: \`${NAME_AND_TAG}\`"
+            echo "- Digest: \`${digest}\`"
+            echo
+            echo '<details>'
+            echo '<summary>Image index</summary>'
+            echo
+            echo '```json'
+            echo "${manifest}"
+            echo '```'
+            echo '</details>'
+          ) >> "$GITHUB_STEP_SUMMARY"
+
+  sign:
+    if: inputs.sign
+    runs-on: ubuntu-latest
+    needs: finalize
+    permissions:
+      packages: write
+      id-token: write
+    continue-on-error: true
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign image
+        env:
+          IMAGE: ${{ needs.finalize.outputs.image }}
+        run: |
+          cosign sign --oidc-provider=github-actions --recursive --yes "${IMAGE}"
