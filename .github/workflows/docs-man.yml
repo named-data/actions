@@ -23,14 +23,14 @@ jobs:
           submodules: ${{ inputs.submodules }}
           show-progress: false
       - name: Install dependencies
-        run: |
-          find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +
-          ./.jenkins
         env:
           CACHE_DIR: ${{ runner.temp }}
           JOB_NAME: Docs
+        run: |
+          find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +
+          ./.jenkins
       - name: Prepare environment
-        run: python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))' >> $GITHUB_PATH
+        run: python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))' >> "$GITHUB_PATH"
       - name: Build man pages
         run: |
           ./waf --color=yes configure

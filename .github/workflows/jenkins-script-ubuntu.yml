@@ -60,8 +60,8 @@ jobs:
               sudo dpkg -i gcc-latest.deb
               rm gcc-latest.deb
               sudo ln -s g++ /opt/gcc-latest/bin/g++-latest
-              echo /opt/gcc-latest/bin >> $GITHUB_PATH
-              echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> $GITHUB_ENV
+              echo /opt/gcc-latest/bin >> "$GITHUB_PATH"
+              echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> "$GITHUB_ENV"
               ;;
             g++-13)
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
@@ -84,6 +84,6 @@ jobs:
           submodules: ${{ inputs.submodules }}
           show-progress: false
       - name: Build and test
-        run: ./.jenkins
         env:
           CACHE_DIR: ${{ runner.temp }}
+        run: ./.jenkins

@@ -41,7 +41,7 @@ jobs:
             PV=${GITHUB_REF_NAME#"${PN}"-}
             PV=${PV#v}
           fi
-          tee -a ${GITHUB_OUTPUT} <<EOF
+          tee -a "$GITHUB_OUTPUT" <<EOF
           name=${PN}
           version=${PV}
           slug=${PN}/${PV}

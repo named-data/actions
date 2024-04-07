@@ -50,6 +50,6 @@ jobs:
           submodules: ${{ inputs.submodules }}
           show-progress: false
       - name: Build and test
-        run: ./.jenkins
         env:
           CACHE_DIR: ${{ runner.temp }}
+        run: ./.jenkins
