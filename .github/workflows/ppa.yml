@@ -53,6 +53,7 @@ jobs:
         run: |
           sudo apt-get -qy install software-properties-common
           sudo add-apt-repository -uy ppa:named-data/ppa
+          # shellcheck disable=SC2086
           sudo apt-get -qy install --no-install-recommends libndn-cxx-dev ${EXTRA_DEPS}
       - name: Release build
         run: |
