@@ -110,16 +110,17 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
 
       - name: Export digest
+        working-directory: ${{ runner.temp }}
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          mkdir -p "${{ runner.temp }}/digests"
-          touch "${{ runner.temp }}/digests/${DIGEST#sha256:}"
+          mkdir digests
+          touch digests/"${DIGEST#sha256:}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digest-${{ inputs.name }}-${{ matrix.arch }}
+          name: digest_${{ inputs.name }}_${{ matrix.arch }}
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -138,7 +139,7 @@ jobs:
         id: download
         uses: actions/download-artifact@v4
         with:
-          pattern: digest-${{ inputs.name }}-*
+          pattern: digest_${{ inputs.name }}_*
           path: ${{ runner.temp }}/digests
           merge-multiple: true
 
@@ -146,7 +147,7 @@ jobs:
         continue-on-error: true
         uses: geekyeggo/delete-artifact@24928e75e6e6590170563b8ddae9fac674508aa1 # v5.0.0
         with:
-          name: digest-${{ inputs.name }}-*
+          name: digest_${{ inputs.name }}_*
 
       - name: Generate metadata
         id: meta
