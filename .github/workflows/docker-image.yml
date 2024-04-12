@@ -25,6 +25,7 @@ on:
         type: boolean
     outputs:
       image:
+        description: 'Full name and digest of the published image'
         value: ${{ jobs.finalize.outputs.image }}
 
 jobs:
@@ -188,20 +189,21 @@ jobs:
           manifest=$(docker buildx imagetools inspect --format '{{json .Manifest}}' "${NAME_AND_TAG}")
           digest=$(jq -j .digest <<< "${manifest}")
           echo "digest=${digest}" >> "$GITHUB_OUTPUT"
-          (
-            echo "## ${SHORT_NAME}"
-            echo
-            echo "- Image name: \`${NAME_AND_TAG}\`"
-            echo "- Digest: \`${digest}\`"
-            echo
-            echo '<details>'
-            echo '<summary>Image index</summary>'
-            echo
-            echo '```json'
-            echo "${manifest}"
-            echo '```'
-            echo '</details>'
-          ) >> "$GITHUB_STEP_SUMMARY"
+
+          cat > "$GITHUB_STEP_SUMMARY" <<EOF
+          ## ${SHORT_NAME}
+
+          - Image name: \`${NAME_AND_TAG}\`
+          - Digest: \`${digest}\`
+
+          <details>
+          <summary>Image index</summary>
+
+          \`\`\`json
+          ${manifest}
+          \`\`\`
+          </details>
+          EOF
 
   sign:
     if: inputs.sign
