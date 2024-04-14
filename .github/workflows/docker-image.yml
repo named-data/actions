@@ -19,6 +19,14 @@ on:
       contexts:
         description: 'List of additional build contexts'
         type: string
+      tag-with-branch:
+        description: 'Whether to tag the image with the git branch name'
+        default: true
+        type: boolean
+      tag-with-sha:
+        description: 'Whether to tag the image with the git commit SHA'
+        default: false
+        type: boolean
       sign:
         description: 'Whether to sign the image'
         default: true
@@ -30,6 +38,9 @@ on:
 
 jobs:
   prepare:
+    if: >-
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'schedule' && github.repository_owner == 'named-data')
     runs-on: ubuntu-latest
     permissions: {}
     outputs:
@@ -80,9 +91,11 @@ jobs:
         with:
           tags: |
             type=schedule,pattern={{date 'YYYYMMDD'}}
-            type=ref,event=branch
+            type=match,pattern=\d.*
+            type=raw,value={{date 'YYYYMMDD'}},enable=${{ github.event_name == 'workflow_dispatch' }},priority=700
+            type=ref,event=branch,enable=${{ inputs.tag-with-branch }}
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+            type=sha,enable=${{ inputs.tag-with-sha }}
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest
 
@@ -157,9 +170,11 @@ jobs:
           images: ${{ needs.prepare.outputs.image-name }}
           tags: |
             type=schedule,pattern={{date 'YYYYMMDD'}}
-            type=ref,event=branch
+            type=match,pattern=\d.*
+            type=raw,value={{date 'YYYYMMDD'}},enable=${{ github.event_name == 'workflow_dispatch' }},priority=700
+            type=ref,event=branch,enable=${{ inputs.tag-with-branch }}
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+            type=sha,enable=${{ inputs.tag-with-sha }}
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: index
 
