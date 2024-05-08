@@ -27,14 +27,14 @@ on:
         description: 'Whether to tag the image with the git commit SHA'
         default: false
         type: boolean
-      sign:
-        description: 'Whether to sign the image'
+      attest:
+        description: 'Whether to publish a signed provenance attestation for the image'
         default: true
         type: boolean
     outputs:
       image:
         description: 'Full name and digest of the published image'
-        value: ${{ jobs.finalize.outputs.image }}
+        value: ${{ jobs.prepare.outputs.image-name }}@${{ jobs.finalize.outputs.image-digest }}
 
 jobs:
   prepare:
@@ -145,7 +145,7 @@ jobs:
     permissions:
       packages: write
     outputs:
-      image: ${{ needs.prepare.outputs.image-name }}@${{ steps.inspect.outputs.digest }}
+      image-digest: ${{ steps.inspect.outputs.digest }}
     env:
       SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.timestamp }}
     steps:
@@ -220,18 +220,16 @@ jobs:
           </details>
           EOF
 
-  sign:
-    if: inputs.sign
+  attest:
+    if: inputs.attest
     runs-on: ubuntu-latest
-    needs: finalize
+    needs: [prepare, finalize]
     permissions:
-      packages: write
+      attestations: write
       id-token: write
+      packages: write
     continue-on-error: true
     steps:
-      - name: Install cosign
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
         with:
@@ -239,8 +237,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sign image
-        env:
-          IMAGE: ${{ needs.finalize.outputs.image }}
-        run: |
-          cosign sign --oidc-provider=github-actions --recursive --yes "${IMAGE}"
+      - name: Generate and sign provenance attestation
+        uses: actions/attest-build-provenance@f8d5ea8082b0d9f5ab855907be308fbd7eefb155 # v1.1.0
+        with:
+          subject-name: ${{ needs.prepare.outputs.image-name }}
+          subject-digest: ${{ needs.finalize.outputs.image-digest }}
+          push-to-registry: true
