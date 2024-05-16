@@ -36,8 +36,9 @@ jobs:
           - {os: ubuntu-22.04, compiler: g++-10}
           - {os: ubuntu-22.04, compiler: g++-11}
           - {os: ubuntu-22.04, compiler: g++-12}
-          - {os: ubuntu-22.04, compiler: g++-13}
-          - {os: ubuntu-22.04, compiler: g++-latest, experimental: true}
+          - {os: ubuntu-24.04, compiler: g++-13}
+          - {os: ubuntu-24.04, compiler: g++-14}
+          # - {os: ubuntu-24.04, compiler: g++-latest, experimental: true}
           - {os: ubuntu-20.04, compiler: clang++-7}
           - {os: ubuntu-20.04, compiler: clang++-10}
           - {os: ubuntu-20.04, compiler: clang++-11}
@@ -45,9 +46,9 @@ jobs:
           - {os: ubuntu-22.04, compiler: clang++-13}
           - {os: ubuntu-22.04, compiler: clang++-14}
           - {os: ubuntu-22.04, compiler: clang++-15}
-          - {os: ubuntu-22.04, compiler: clang++-16}
-          - {os: ubuntu-22.04, compiler: clang++-17}
-          - {os: ubuntu-22.04, compiler: clang++-18}
+          - {os: ubuntu-24.04, compiler: clang++-16}
+          - {os: ubuntu-24.04, compiler: clang++-17}
+          - {os: ubuntu-24.04, compiler: clang++-18}
           - {os: ubuntu-22.04, compiler: clang++-19, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
@@ -63,10 +64,10 @@ jobs:
               echo /opt/gcc-latest/bin >> "$GITHUB_PATH"
               echo LD_RUN_PATH=/opt/gcc-latest/lib64 >> "$GITHUB_ENV"
               ;;
-            g++-13)
+            g++-15)
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
-            clang++-1[6789])
+            clang++-19)
               curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
                 | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
               ;;&
