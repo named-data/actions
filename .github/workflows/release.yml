@@ -63,6 +63,7 @@ jobs:
       - name: Prepare release notes
         if: env.RELEASE_NOTES
         run: |
+          # shellcheck disable=SC2016
           sed -E "${RELEASE_NOTES}" \
               -e '/[Rr]elease [Dd]ate:/d' \
               -e 's|:issue:`([0-9]+)`|`#\1 <https://redmine.named-data.net/issues/\1>`__|g' \
