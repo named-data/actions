@@ -49,7 +49,7 @@ jobs:
           - {os: ubuntu-24.04, compiler: clang++-16}
           - {os: ubuntu-24.04, compiler: clang++-17}
           - {os: ubuntu-24.04, compiler: clang++-18}
-          - {os: ubuntu-22.04, compiler: clang++-19, experimental: true}
+          - {os: ubuntu-24.04, compiler: clang++-19, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
