@@ -16,7 +16,7 @@ on:
         type: string
       artifact-retention-days:
         description: 'Number of days after which the artifact will expire'
-        default: 10
+        default: 15
         type: number
       deploy:
         description: 'Whether to deploy the documentation'

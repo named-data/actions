@@ -108,7 +108,7 @@ jobs:
 
       - name: Build and push ${{ matrix.arch }} image
         id: build
-        uses: docker/build-push-action@15560696de535e4014efeff63c48f16952e52dd1 # v6.2.0
+        uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c # v6.3.0
         with:
           platforms: linux/${{ matrix.arch }}
           file: ${{ inputs.dockerfile }}
@@ -122,6 +122,9 @@ jobs:
           provenance: mode=max
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
+        env:
+          DOCKER_BUILD_SUMMARY: ${{ runner.debug == 1 }}
+          DOCKER_BUILD_RECORD_RETENTION_DAYS: 15
 
       - name: Export digest
         working-directory: ${{ runner.temp }}
