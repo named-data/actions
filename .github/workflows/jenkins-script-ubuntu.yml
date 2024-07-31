@@ -50,6 +50,7 @@ jobs:
           - {os: ubuntu-24.04, compiler: clang++-17}
           - {os: ubuntu-24.04, compiler: clang++-18}
           - {os: ubuntu-24.04, compiler: clang++-19, experimental: true}
+          - {os: ubuntu-24.04, compiler: clang++-20, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
@@ -67,7 +68,7 @@ jobs:
             g++-15)
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
-            clang++-19)
+            clang++-19|clang++-20)
               curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
                 | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
               ;;&
