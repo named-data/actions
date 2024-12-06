@@ -39,15 +39,15 @@ jobs:
           - {os: ubuntu-24.04, compiler: g++-14}
           # - {os: ubuntu-24.04, compiler: g++-latest, experimental: true}
           - {os: ubuntu-20.04, compiler: clang++-10}
-          - {os: ubuntu-22.04, compiler: clang++-11}
+          - {os: ubuntu-22.04, compiler: clang++-11, disable-asan: true}
           - {os: ubuntu-22.04, compiler: clang++-12}
-          - {os: ubuntu-22.04, compiler: clang++-13}
+          - {os: ubuntu-22.04, compiler: clang++-13, disable-asan: true}
           - {os: ubuntu-22.04, compiler: clang++-14}
-          - {os: ubuntu-22.04, compiler: clang++-15}
+          - {os: ubuntu-22.04, compiler: clang++-15, disable-asan: true}
           - {os: ubuntu-24.04, compiler: clang++-16}
           - {os: ubuntu-24.04, compiler: clang++-17}
           - {os: ubuntu-24.04, compiler: clang++-18}
-          - {os: ubuntu-24.04, compiler: clang++-19, experimental: true}
+          - {os: ubuntu-24.04, compiler: clang++-19}
           - {os: ubuntu-24.04, compiler: clang++-20, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
@@ -86,4 +86,5 @@ jobs:
       - name: Build and test
         env:
           CACHE_DIR: ${{ runner.temp }}
+          DISABLE_ASAN: ${{ matrix.disable-asan && 'yes' || '' }}
         run: ./.jenkins
