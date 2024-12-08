@@ -51,7 +51,7 @@ jobs:
           done
       - name: Generate signed provenance attestation
         if: inputs.attest
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-path: '*-${{ steps.info.outputs.version }}.tar.xz'
       - name: Install pandoc
