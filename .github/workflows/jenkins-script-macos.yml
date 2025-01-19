@@ -24,7 +24,7 @@ permissions: {}
 
 jobs:
   build:
-    name: Xcode ${{ matrix.xcode }}
+    name: Xcode ${{ matrix.xcode }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

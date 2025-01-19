@@ -24,7 +24,7 @@ permissions: {}
 
 jobs:
   build:
-    name: ${{ matrix.compiler }}
+    name: ${{ matrix.compiler }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ !!matrix.experimental }}
     strategy:
@@ -36,7 +36,9 @@ jobs:
           - {os: ubuntu-22.04, compiler: g++-11}
           - {os: ubuntu-22.04, compiler: g++-12}
           - {os: ubuntu-24.04, compiler: g++-13}
+          - {os: ubuntu-24.04-arm, compiler: g++-13}
           - {os: ubuntu-24.04, compiler: g++-14}
+          - {os: ubuntu-24.04-arm, compiler: g++-14}
           - {os: ubuntu-24.04, compiler: g++-latest, experimental: true}
           - {os: ubuntu-20.04, compiler: clang++-10}
           - {os: ubuntu-22.04, compiler: clang++-11, disable-asan: true}
@@ -46,7 +48,9 @@ jobs:
           - {os: ubuntu-22.04, compiler: clang++-15, disable-asan: true}
           - {os: ubuntu-24.04, compiler: clang++-16}
           - {os: ubuntu-24.04, compiler: clang++-17}
+          - {os: ubuntu-24.04-arm, compiler: clang++-17, disable-asan: true}
           - {os: ubuntu-24.04, compiler: clang++-18}
+          - {os: ubuntu-24.04-arm, compiler: clang++-18}
           - {os: ubuntu-24.04, compiler: clang++-19}
           - {os: ubuntu-24.04, compiler: clang++-20, experimental: true}
     env:
