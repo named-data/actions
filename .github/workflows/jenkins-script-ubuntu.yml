@@ -50,12 +50,14 @@ jobs:
           - {os: ubuntu-24.04, compiler: clang++-18}
           - {os: ubuntu-24.04-arm, compiler: clang++-18}
           - {os: ubuntu-24.04, compiler: clang++-19}
-          - {os: ubuntu-24.04, compiler: clang++-20, experimental: true}
+          - {os: ubuntu-24.04, compiler: clang++-20}
+          - {os: ubuntu-24.04, compiler: clang++-21, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
       - name: Install C++ compiler
         run: |
+          shopt -s extglob
           case ${CXX} in
             g++-latest)
               curl -fLOSs 'https://kayari.org/gcc-latest/gcc-latest.deb'
@@ -68,7 +70,7 @@ jobs:
             g++-15)
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
-            clang++-19|clang++-20)
+            clang++-@(19|20|21))
               curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
                 | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
               ;;&
