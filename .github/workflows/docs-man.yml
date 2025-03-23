@@ -22,6 +22,11 @@ jobs:
         with:
           submodules: ${{ inputs.submodules }}
           show-progress: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@22695119d769bdb6f7032ad67b9bca0ef8c4a174 # v5.4.0
+        with:
+          version: '0.6.x'
+          enable-cache: false
       - name: Install dependencies
         env:
           CACHE_DIR: ${{ runner.temp }}
@@ -29,8 +34,6 @@ jobs:
         run: |
           find .jenkins.d/ -type f -name '[1-9]*.sh' -exec chmod -x '{}' +
           ./.jenkins
-      - name: Prepare environment
-        run: python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))' >> "$GITHUB_PATH"
       - name: Build man pages
         run: |
           ./waf --color=yes configure
