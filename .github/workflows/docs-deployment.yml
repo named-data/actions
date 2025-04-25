@@ -4,17 +4,23 @@ on:
     inputs:
       project:
         description: >
-          Project name. By default, this is derived from $GITHUB_REPOSITORY.
+          Project name. By default, this is derived from `$GITHUB_REPOSITORY`.
         type: string
       version:
         description: >
-          Project version. By default, this is derived from $GITHUB_REF_NAME.
+          Project version. By default, this is derived from `$GITHUB_REF_NAME`.
         type: string
       artifact-name:
         description: >
-          Name of the artifact containing the files to be deployed. Any
-          top-level tarballs in the artifact are automatically extracted.
-        default: docs
+          Name of the artifact containing the files to deploy. Any top-level tarballs
+          in the artifact are automatically extracted. Either `artifact-name` or
+          `artifact-id` can be used, but not both.
+        type: string
+      artifact-id:
+        description: >
+          ID of the artifact containing the files to deploy. Any top-level tarballs
+          in the artifact are automatically extracted. Either `artifact-name` or
+          `artifact-id` can be used, but not both.
         type: string
 
 permissions: {}
@@ -50,6 +56,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
+          artifact-ids: ${{ inputs.artifact-id }}
       - name: Extract archive
         run: |
           shopt -s nullglob
