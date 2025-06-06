@@ -44,11 +44,7 @@ jobs:
           prerelease=$(grep -Ec 'alpha|beta|pre|rc' VERSION.info)
           EOF
       - name: Create source tarball
-        run: |
-          ./waf --color=yes dist
-          for tarball in *.tar.xz; do
-            sha256sum "${tarball}" | tee "${tarball}.sha256"
-          done
+        run: ./waf --color=yes dist
       - name: Generate signed provenance attestation
         if: inputs.attest
         uses: actions/attest-build-provenance@v2
@@ -77,7 +73,5 @@ jobs:
           name: ${{ steps.info.outputs.version }}
           body_path: ${{ env.RELEASE_NOTES }}
           generate_release_notes: ${{ env.RELEASE_NOTES == '' }}
-          files: |
-            *-${{ steps.info.outputs.version }}.tar.xz
-            *-${{ steps.info.outputs.version }}.tar.xz.sha256
+          files: '*-${{ steps.info.outputs.version }}.tar.xz'
           fail_on_unmatched_files: true
