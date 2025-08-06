@@ -53,11 +53,10 @@ jobs:
           slug=${PN}/${PV}
           EOF
       - name: Download archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ inputs.artifact-name }}
           artifact-ids: ${{ inputs.artifact-id }}
-          merge-multiple: true
       - name: Extract archive
         run: find . -maxdepth 1 -type f -name '*.tar.*' -printf '%P\n' -exec tar -xf '{}' \; -delete
       - name: Deploy to ${{ vars.DOCS_DEPLOYMENT_HOST }}
