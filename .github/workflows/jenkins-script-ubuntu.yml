@@ -82,7 +82,7 @@ jobs:
       - name: Print compiler version
         run: ${CXX} --version
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
