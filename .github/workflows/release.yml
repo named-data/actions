@@ -47,7 +47,7 @@ jobs:
         run: ./waf --color=yes dist
       - name: Generate signed provenance attestation
         if: inputs.attest
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: '*-${{ steps.info.outputs.version }}.tar.xz'
       - name: Install pandoc
