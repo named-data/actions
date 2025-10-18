@@ -32,7 +32,7 @@ jobs:
     concurrency: docs
     environment:
       name: docs
-      url: https://${{ vars.DOCS_DEPLOYMENT_HOST }}/${{ steps.metadata.outputs.slug }}/
+      url: https://docs.named-data.net/${{ steps.metadata.outputs.slug }}/
     steps:
       - name: Determine project name and version
         id: metadata
@@ -59,7 +59,7 @@ jobs:
           artifact-ids: ${{ inputs.artifact-id }}
       - name: Extract archive
         run: find . -maxdepth 1 -type f -name '*.tar.*' -printf '%P\n' -exec tar -xf '{}' \; -delete
-      - name: Deploy to ${{ vars.DOCS_DEPLOYMENT_HOST }}
+      - name: Deploy
         uses: easingthemes/ssh-deploy@a1aa0b6cf96ce2406eef90faa35007a4a7bf0ac0 # v5.1.1
         with:
           ARGS: -chirvzEW --delay-updates --delete-delay
