@@ -80,7 +80,7 @@ jobs:
 
       - name: Generate metadata for ${{ matrix.arch }} image
         id: meta
-        uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v5.9.0
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           tags: |
             type=schedule,pattern={{date 'YYYYMMDD'}}
@@ -161,7 +161,7 @@ jobs:
 
       - name: Generate metadata for image index
         id: meta
-        uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v5.9.0
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ${{ needs.prepare.outputs.image-name }}
           tags: |
