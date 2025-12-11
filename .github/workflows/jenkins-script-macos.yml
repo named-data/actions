@@ -36,7 +36,7 @@ jobs:
           - {os: macos-14, xcode: '15.4'} # Based on LLVM 16
           - {os: macos-15, xcode: '16.2'} # Based on LLVM 17
           - {os: macos-15, xcode: '16.4'} # Based on LLVM 19
-          - {os: macos-26, xcode: '26.0'} # Based on LLVM 19
+          - {os: macos-26, xcode: '26.1'} # Based on LLVM 19
     steps:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
