@@ -147,7 +147,7 @@ jobs:
     steps:
       - name: Download digests
         id: download
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: digest_${{ inputs.name }}_*
           path: ${{ runner.temp }}/digests
