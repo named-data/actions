@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   actionlint:
+    # Cannot run on ubuntu-slim because reviewdog/action-actionlint requires docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

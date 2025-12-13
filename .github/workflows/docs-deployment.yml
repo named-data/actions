@@ -28,7 +28,7 @@ permissions: {}
 jobs:
   deploy:
     if: vars.DOCS_DEPLOYMENT_HOST != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     concurrency: docs
     environment:
       name: docs
