@@ -63,7 +63,7 @@ jobs:
           EOF
 
   build:
-    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+    runs-on: ${{ case(matrix.arch == 'arm64', 'ubuntu-24.04-arm', 'ubuntu-24.04') }}
     needs: prepare
     permissions:
       packages: write

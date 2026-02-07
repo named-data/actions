@@ -92,5 +92,5 @@ jobs:
       - name: Build and test
         env:
           CACHE_DIR: ${{ runner.temp }}
-          DISABLE_ASAN: ${{ matrix.disable-asan && 'yes' || '' }}
+          DISABLE_ASAN: ${{ case(!!matrix.disable-asan, 'yes', '') }}
         run: ./.jenkins

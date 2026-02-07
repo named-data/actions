@@ -47,7 +47,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: ${{ !matrix.upload && 1 || 0 }}
+          fetch-depth: ${{ case(!!matrix.upload, 0, 1) }}
           submodules: ${{ inputs.submodules }}
           show-progress: false
       - name: Install uv
