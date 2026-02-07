@@ -50,12 +50,6 @@ jobs:
           fetch-depth: ${{ !matrix.upload && 1 || 0 }}
           submodules: ${{ inputs.submodules }}
           show-progress: false
-      - name: Fix tag
-        # Workaround actions/checkout bug
-        # https://github.com/actions/checkout/issues/290
-        # https://github.com/actions/checkout/issues/882
-        if: github.ref_type == 'tag'
-        run: git fetch -fv origin tag "${GITHUB_REF_NAME}"
       - name: Install uv
         uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
         with:

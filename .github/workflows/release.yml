@@ -27,11 +27,6 @@ jobs:
         with:
           submodules: ${{ inputs.submodules }}
           show-progress: false
-      - name: Fix tag
-        # Workaround actions/checkout bug
-        # https://github.com/actions/checkout/issues/290
-        # https://github.com/actions/checkout/issues/882
-        run: git fetch -fv origin tag "${GITHUB_REF_NAME}"
       - name: Determine release info
         id: info
         run: |
