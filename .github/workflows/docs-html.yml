@@ -49,6 +49,7 @@ jobs:
         with:
           fetch-depth: ${{ case(!!matrix.upload, 0, 1) }}
           submodules: ${{ inputs.submodules }}
+          persist-credentials: false
           show-progress: false
       - name: Install uv
         uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1

@@ -88,6 +88,7 @@ jobs:
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
+          persist-credentials: false
           show-progress: false
       - name: Build and test
         env:
