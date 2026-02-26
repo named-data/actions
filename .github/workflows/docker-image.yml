@@ -235,8 +235,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate and sign provenance attestation
-        uses: actions/attest-build-provenance@v3
+      - name: Generate provenance attestation
+        uses: actions/attest@v4
         with:
           subject-name: ${{ needs.prepare.outputs.image-name }}
           subject-digest: ${{ needs.finalize.outputs.image-digest }}

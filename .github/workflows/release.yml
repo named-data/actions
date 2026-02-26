@@ -41,9 +41,9 @@ jobs:
           EOF
       - name: Create source tarball
         run: ./waf --color=yes dist
-      - name: Generate signed provenance attestation
+      - name: Generate provenance attestation
         if: inputs.attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest@v4
         with:
           subject-path: '*-${{ steps.info.outputs.version }}.tar.xz'
       - name: Install pandoc
