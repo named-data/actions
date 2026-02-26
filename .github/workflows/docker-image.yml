@@ -143,6 +143,7 @@ jobs:
       packages: write
     outputs:
       image-digest: ${{ steps.inspect.outputs.digest }}
+      image-version: ${{ steps.meta.outputs.version }}
     env:
       SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.timestamp }}
     steps:
@@ -240,5 +241,6 @@ jobs:
         with:
           subject-name: ${{ needs.prepare.outputs.image-name }}
           subject-digest: ${{ needs.finalize.outputs.image-digest }}
+          subject-version: ${{ needs.finalize.outputs.image-version }}
           push-to-registry: true
           show-summary: false
