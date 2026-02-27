@@ -43,6 +43,8 @@ jobs:
         include:
           - os: ubuntu-24.04
             upload: ${{ inputs.upload || inputs.deploy }}
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -70,16 +72,19 @@ jobs:
           ./waf --color=yes docs
       - name: Create archive
         if: matrix.upload
+        env:
+          ARCHIVE_NAME: ${{ inputs.artifact-name }}.tar.zst
         run: |
           rm -rf build/docs/{.buildinfo,.doctrees,Doxyfile,doxygen.conf}
-          tar -caf docs.tar.zst -C build/docs .
+          tar -caf "${ARCHIVE_NAME}" -C build/docs .
       - name: Upload archive
         if: matrix.upload
-        uses: actions/upload-artifact@v6
+        id: upload
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.artifact-name }}
-          path: docs.tar.zst
-          compression-level: 0
+          path: ${{ inputs.artifact-name }}.tar.zst
+          archive: false
+          if-no-files-found: error
           retention-days: ${{ inputs.artifact-retention-days }}
 
   deploy:
@@ -89,5 +94,5 @@ jobs:
     with:
       project: ${{ inputs.project }}
       version: ${{ inputs.version }}
-      artifact-name: ${{ inputs.artifact-name }}
+      artifact-id: ${{ needs.build.outputs.artifact-id }}
     secrets: inherit
