@@ -58,6 +58,8 @@ jobs:
       CXX: ${{ matrix.compiler }}
     steps:
       - name: Install C++ compiler
+        env:
+          LLVM_APT_SOURCES_URL: ${{ github.server_url }}/${{ job.workflow_repository }}/raw/${{ job.workflow_sha }}
         run: |
           shopt -s extglob
           case ${CXX} in
@@ -73,8 +75,7 @@ jobs:
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
             clang++-@(19|20|21|22|23))
-              curl -fLSs "${GITHUB_SERVER_URL}/named-data/actions/raw/v1/llvm-$(lsb_release -cs).sources" \
-                | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
+              curl -fLSs "${LLVM_APT_SOURCES_URL}/llvm-$(lsb_release -cs).sources" | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
               ;;&
             *)
               sudo apt-get -qq update
