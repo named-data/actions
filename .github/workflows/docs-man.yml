@@ -18,7 +18,7 @@ jobs:
         os: [macos-15, ubuntu-24.04]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: ${{ inputs.submodules }}
           persist-credentials: false
