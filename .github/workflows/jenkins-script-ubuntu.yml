@@ -88,7 +88,7 @@ jobs:
       - name: Log compiler version
         run: ${CXX} --version
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ inputs.repository || github.repository }}
           submodules: ${{ inputs.submodules }}
