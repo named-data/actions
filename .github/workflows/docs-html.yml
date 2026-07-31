@@ -90,7 +90,7 @@ jobs:
   deploy:
     if: inputs.deploy
     needs: build
-    uses: ./.github/workflows/docs-deployment.yml
+    uses: $/.github/workflows/docs-deployment.yml
     with:
       project: ${{ inputs.project }}
       version: ${{ inputs.version }}
