@@ -57,7 +57,8 @@ jobs:
           - {os: ubuntu-26.04-arm, compiler: clang++-21}
           - {os: ubuntu-26.04, compiler: clang++-22}
           - {os: ubuntu-26.04-arm, compiler: clang++-22}
-          - {os: ubuntu-26.04, compiler: clang++-23, experimental: true}
+          - {os: ubuntu-26.04, compiler: clang++-23}
+          - {os: ubuntu-26.04, compiler: clang++-24, experimental: true}
     env:
       CXX: ${{ matrix.compiler }}
     steps:
@@ -77,7 +78,7 @@ jobs:
             g++-99)
               sudo add-apt-repository -ny -P ubuntu-toolchain-r/test
               ;;&
-            clang++-23)
+            clang++-2[34])
               curl -fLSs "${LLVM_APT_SOURCES_URL}/llvm-$(lsb_release -cs).sources" | sudo tee /etc/apt/sources.list.d/llvm.sources >/dev/null
               ;;&
             *)

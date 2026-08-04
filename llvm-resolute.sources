@@ -1,6 +1,6 @@
 Types: deb deb-src
 URIs: http://apt.llvm.org/resolute/
-Suites: llvm-toolchain-resolute
+Suites: llvm-toolchain-resolute llvm-toolchain-resolute-23
 Components: main
 Signed-By:
  -----BEGIN PGP PUBLIC KEY BLOCK-----
